@@ -1,8 +1,28 @@
+<?php
+    require('configuration/config.php');
+    if(isset($_GET['id']))
+    {
+        $id=$_GET['id'];
+        $sql = "SELECT * FROM user WHERE id='$id'";
+        try 
+        {
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            //check if it is a valid id
+            if($stmt->rowCount()>0)
+            {
+                // echo('id exist');
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $userName=$result['name'];
+                $email=$result['email'];
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Zay Shop - Product Listing Page</title>
+    <title>MicroE - Products</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -16,6 +36,13 @@
     <!-- Load fonts style after rendering the layout styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
     <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+
+    <style>
+        .colorGreen{
+            color:#59Ab6E;
+            font-weight: bold;  
+        }
+    </style>
 <!--
     
 TemplateMo 559 Zay Shop
@@ -31,10 +58,10 @@ https://templatemo.com/tm-559-zay-shop
         <div class="container text-light">
             <div class="w-100 d-flex justify-content-between">
                 <div>
-                    <i class="fa fa-envelope mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="mailto:info@company.com">info@company.com</a>
+                    <i class="fa fa-envelope mx-2 "></i>
+                    <a class="navbar-sm-brand text-light text-decoration-none color" href="mailto:info@company.com">group@group.com</a>
                     <i class="fa fa-phone mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                    <a class="navbar-sm-brand text-light text-decoration-none color" href="tel:079-999-9999">(+962) - 799999999</a>
                 </div>
                 <div>
                     <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
@@ -53,7 +80,7 @@ https://templatemo.com/tm-559-zay-shop
         <div class="container d-flex justify-content-between align-items-center">
 
             <a class="navbar-brand text-success logo h1 align-self-center" href="index.php">
-                Zay
+                MicroE
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +91,7 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="index.php">Home</a>
+                            <a class="nav-link" href="index.php?id=<?php echo($id); ?>">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="about.php">About</a>
@@ -130,17 +157,47 @@ https://templatemo.com/tm-559-zay-shop
             <div class="col-lg-3">
                 <h1 class="h2 pb-4">Categories</h1>
                 <ul class="list-unstyled templatemo-accordion">
+                <!--  display the categories -->
+                <?php
+                    $sql="SELECT * FROM catagory";
+                    try
+                    {
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                        {
+
+                ?> 
                     <li class="pb-3">
                         <a class="collapsed d-flex justify-content-between h3 text-decoration-none" href="#">
-                            Gender
+                            <?php echo($row['name']); ?>
                             <i class="fa fa-fw fa-chevron-circle-down mt-1"></i>
                         </a>
-                        <ul class="collapse show list-unstyled pl-3">
-                            <li><a class="text-decoration-none" href="#">Men</a></li>
-                            <li><a class="text-decoration-none" href="#">Women</a></li>
+                        <ul class="collapse show  pl-3">
+                            <!-- display the subCategory(brand)-->
+                            <?php
+                                $sqlSub = "SELECT * FROM sub_catagory WHERE catagory_id='" . $row["id"] . "'";
+                                try
+                                {
+                                    $stmtSub = $conn->prepare($sqlSub);
+                                    $stmtSub->execute();
+                                    while($rowInRow = $stmtSub->fetch(PDO::FETCH_ASSOC))
+                                    {
+                            ?>
+                            <!-- <li><a class="text-decoration-none" href="#">Men</a></li>
+                            <li><a class="text-decoration-none" href="#">Women</a></li> -->
+                            <li><a class="text-decoration-none" href="#"><?php echo($rowInRow['name']); ?></a></li>
+                            <?php
+                                    }//end of while
+                                }//end of try
+                                catch(PDOException $e)
+                                {
+                                    echo "Connection failed: " . $e->getMessage();
+                                }
+                            ?>
                         </ul>
                     </li>
-                    <li class="pb-3">
+                    <!-- <li class="pb-3">
                         <a class="collapsed d-flex justify-content-between h3 text-decoration-none" href="#">
                             Sale
                             <i class="pull-right fa fa-fw fa-chevron-circle-down mt-1"></i>
@@ -160,7 +217,15 @@ https://templatemo.com/tm-559-zay-shop
                             <li><a class="text-decoration-none" href="#">Sweather</a></li>
                             <li><a class="text-decoration-none" href="#">Sunglass</a></li>
                         </ul>
-                    </li>
+                    </li> -->
+                <?php
+                    }//end of while-parent
+                    }//end of try-parent
+                    catch(PDOException $e)
+                    {
+                        echo "Connection failed: " . $e->getMessage();
+                    }
+                ?>
                 </ul>
             </div>
 
@@ -172,10 +237,13 @@ https://templatemo.com/tm-559-zay-shop
                                 <a class="h3 text-dark text-decoration-none mr-3" href="#">All</a>
                             </li>
                             <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none mr-3" href="#">Men's</a>
+                                <a class="h3 text-dark text-decoration-none mr-3" href="#">Pc</a>
                             </li>
                             <li class="list-inline-item">
-                                <a class="h3 text-dark text-decoration-none" href="#">Women's</a>
+                                <a class="h3 text-dark text-decoration-none" href="#">Laptop</a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a class="h3 text-dark text-decoration-none" href="#">Accessories</a>
                             </li>
                         </ul>
                     </div>
@@ -189,23 +257,40 @@ https://templatemo.com/tm-559-zay-shop
                         </div>
                     </div>
                 </div>
+
+
+                <!--products-->
                 <div class="row">
+                    <?php
+                        $sql="SELECT * FROM products";
+                        try
+                        {
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute();
+                            while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                            {
+    
+                    ?>
+                    <!--dispaly all products-->
                     <div class="col-md-4">
                         <div class="card mb-4 product-wap rounded-0">
                             <div class="card rounded-0">
-                                <img class="card-img rounded-0 img-fluid" src="assets/img/shop_01.jpg">
+                                <!--src of the img-->
+                                <img class="card-img rounded-0 img-fluid" src="imgProduct/<?php echo($row['image']); ?>">
                                 <div class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
                                     <ul class="list-unstyled">
-                                        <li><a class="btn btn-success text-white" href="shop-single.php"><i class="far fa-heart"></i></a></li>
-                                        <li><a class="btn btn-success text-white mt-2" href="shop-single.php"><i class="far fa-eye"></i></a></li>
+                                        <!-- <li><a class="btn btn-success text-white" href="shop-single.php"><i class="far fa-heart"></i></a></li> -->
+                                        <li><a class="btn btn-success text-white mt-2" href="shop-single.php?id=<?php echo($id); ?>&productId=<?php echo($row['id']); ?>"><i class="far fa-eye"></i></a></li>
                                         <li><a class="btn btn-success text-white mt-2" href="shop-single.php"><i class="fas fa-cart-plus"></i></a></li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <a href="shop-single.php" class="h3 text-decoration-none">Oupidatat non</a>
+                                <!--name of the product-->
+                                <a href="shop-single.php" class="h3 text-decoration-none"><?php echo($row['name']); ?></a>
                                 <ul class="w-100 list-unstyled d-flex justify-content-between mb-0">
-                                    <li>M/L/X/XL</li>
+                                    <!--quentity-->
+                                    <li>Quantity: <span class="colorGreen"><?php echo($row['quantity']); ?></span></li>
                                     <li class="pt-2">
                                         <span class="product-color-dot color-dot-red float-left rounded-circle ml-1"></span>
                                         <span class="product-color-dot color-dot-blue float-left rounded-circle ml-1"></span>
@@ -214,7 +299,8 @@ https://templatemo.com/tm-559-zay-shop
                                         <span class="product-color-dot color-dot-green float-left rounded-circle ml-1"></span>
                                     </li>
                                 </ul>
-                                <ul class="list-unstyled d-flex justify-content-center mb-1">
+                                <!--ratings-->
+                                <!-- <ul class="list-unstyled d-flex justify-content-center mb-1">
                                     <li>
                                         <i class="text-warning fa fa-star"></i>
                                         <i class="text-warning fa fa-star"></i>
@@ -222,12 +308,14 @@ https://templatemo.com/tm-559-zay-shop
                                         <i class="text-muted fa fa-star"></i>
                                         <i class="text-muted fa fa-star"></i>
                                     </li>
-                                </ul>
-                                <p class="text-center mb-0">$250.00</p>
+                                </ul> -->
+                                <!--price-->
+                                <hr>
+                                <p class="text-center mb-0"><b><?php echo($row['price']); ?>$</b></p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="card mb-4 product-wap rounded-0">
                             <div class="card rounded-0">
                                 <img class="card-img rounded-0 img-fluid" src="assets/img/shop_02.jpg">
@@ -522,7 +610,15 @@ https://templatemo.com/tm-559-zay-shop
                                 <p class="text-center mb-0">$250.00</p>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                <?php
+                    }//end of while-parent
+                    }//end of try-parent
+                    catch(PDOException $e)
+                    {
+                        echo "Connection failed: " . $e->getMessage();
+                    }
+                ?>
                 </div>
                 <div div="row">
                     <ul class="pagination pagination-lg justify-content-end">
@@ -654,19 +750,19 @@ https://templatemo.com/tm-559-zay-shop
             <div class="row">
 
                 <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">Zay Shop</h2>
+                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">MicroE</h2>
                     <ul class="list-unstyled text-light footer-link-list">
                         <li>
                             <i class="fas fa-map-marker-alt fa-fw"></i>
-                            123 Consectetur at ligula 10660
+                            JORDAN, AMMAN
                         </li>
                         <li>
                             <i class="fa fa-phone fa-fw"></i>
-                            <a class="text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                            <a class="text-decoration-none" href="tel:010-020-0340">079-999-9999</a>
                         </li>
                         <li>
                             <i class="fa fa-envelope fa-fw"></i>
-                            <a class="text-decoration-none" href="mailto:info@company.com">info@company.com</a>
+                            <a class="text-decoration-none" href="mailto:info@company.com">group@group.com</a>
                         </li>
                     </ul>
                 </div>
@@ -674,13 +770,31 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="col-md-4 pt-5">
                     <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="#">Luxury</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Wear</a></li>
+                <?php
+                    $sql="SELECT * FROM catagory";
+                    try
+                    {
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                        {
+                ?>
+
+                        <li><a class="text-decoration-none" href="#"><?php echo($row['name']); ?></a></li>
+                        <!-- <li><a class="text-decoration-none" href="#">Sport Wear</a></li>
                         <li><a class="text-decoration-none" href="#">Men's Shoes</a></li>
                         <li><a class="text-decoration-none" href="#">Women's Shoes</a></li>
                         <li><a class="text-decoration-none" href="#">Popular Dress</a></li>
                         <li><a class="text-decoration-none" href="#">Gym Accessories</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Shoes</a></li>
+                        <li><a class="text-decoration-none" href="#">Sport Shoes</a></li> -->
+                    <?php
+                    }//end of while
+                    }//end of try
+                    catch (PDOException $e)
+                    {
+                        echo "Connection failed: " . $e->getMessage();
+                    } 
+                    ?>
                     </ul>
                 </div>
 
@@ -689,12 +803,8 @@ https://templatemo.com/tm-559-zay-shop
                     <ul class="list-unstyled text-light footer-link-list">
                         <li><a class="text-decoration-none" href="#">Home</a></li>
                         <li><a class="text-decoration-none" href="#">About Us</a></li>
-                        <li><a class="text-decoration-none" href="#">Shop Locations</a></li>
-                        <li><a class="text-decoration-none" href="#">FAQs</a></li>
-                        <li><a class="text-decoration-none" href="#">Contact</a></li>
                     </ul>
                 </div>
-
             </div>
 
             <div class="row text-light mb-4">
@@ -717,13 +827,13 @@ https://templatemo.com/tm-559-zay-shop
                         </li>
                     </ul>
                 </div>
-                <div class="col-auto">
+                  <!--<div class="col-auto">
                     <label class="sr-only" for="subscribeEmail">Email address</label>
-                    <div class="input-group mb-2">
+                   <div class="input-group mb-2">
                         <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
                         <div class="input-group-text btn-success text-light">Subscribe</div>
-                    </div>
-                </div>
+                    </div
+                </div>> -->
             </div>
         </div>
 
@@ -732,7 +842,7 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="row pt-2">
                     <div class="col-12">
                         <p class="text-left text-light">
-                            Copyright &copy; 2021 Company Name 
+                            Copyright &copy; 2023 MicroE 
                             | Designed by <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
                         </p>
                     </div>
@@ -753,3 +863,18 @@ https://templatemo.com/tm-559-zay-shop
 </body>
 
 </html>
+
+<?php
+    }//if for checking the id
+    else echo('invalid id number');
+    }//end of try
+    catch (PDOException $e)
+    {
+        echo "Connection failed: " . $e->getMessage();
+    }    
+    }//if for check the $_GET['id']
+    else // if the id does not exist
+    {
+        echo('no id');
+    }
+?>

@@ -1,8 +1,27 @@
+<?php
+    require('configuration/config.php');
+    if(isset($_GET['id']))
+    {
+        $id=$_GET['id'];
+        $sql = "SELECT * FROM user WHERE id='$id'";
+        try 
+        {
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            //check if it is a valid id
+            if($stmt->rowCount()>0)
+            {
+                // echo('id exist');
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $userName=$result['name'];
+                $email=$result['email'];
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Zay Shop eCommerce HTML CSS Template</title>
+    <title>MicroE</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -16,6 +35,8 @@
     <!-- Load fonts style after rendering the layout styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
     <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+    <!-- font awsome link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" integrity="sha512-8RxmFOVaKQe/xtg6lbscU9DU0IRhURWEuiI0tXevv+lXbAHfkpamD4VKFQRto9WgfOJDwOZ74c/s9Yesv3VvIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!--
     
 TemplateMo 559 Zay Shop
@@ -23,6 +44,14 @@ TemplateMo 559 Zay Shop
 https://templatemo.com/tm-559-zay-shop
 
 -->
+<style>
+    .color:hover{
+        color:#59AB6E;
+    }
+    .pColor{
+        color:#59AB6E;
+    }
+</style>
 </head>
 
 <body>
@@ -31,16 +60,16 @@ https://templatemo.com/tm-559-zay-shop
         <div class="container text-light">
             <div class="w-100 d-flex justify-content-between">
                 <div>
-                    <i class="fa fa-envelope mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="mailto:info@company.com">info@company.com</a>
+                    <i class="fa fa-envelope mx-2 "></i>
+                    <a class="navbar-sm-brand text-light text-decoration-none color" href="mailto:info@company.com">group@group.com</a>
                     <i class="fa fa-phone mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                    <a class="navbar-sm-brand text-light text-decoration-none color" href="tel:079-999-9999">(+962) - 799999999</a>
                 </div>
                 <div>
-                    <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
-                    <a class="text-light" href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
-                    <a class="text-light" href="https://twitter.com/" target="_blank"><i class="fab fa-twitter fa-sm fa-fw me-2"></i></a>
-                    <a class="text-light" href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin fa-sm fa-fw"></i></a>
+                    <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i class="fab fa-facebook-f fa-sm fa-fw me-2 color"></i></a>
+                    <a class="text-light" href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2 color"></i></a>
+                    <a class="text-light" href="https://twitter.com/" target="_blank"><i class="fab fa-twitter fa-sm fa-fw me-2 color"></i></a>
+                    <a class="text-light" href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin fa-sm fa-fw color"></i></a>
                 </div>
             </div>
         </div>
@@ -53,7 +82,7 @@ https://templatemo.com/tm-559-zay-shop
         <div class="container d-flex justify-content-between align-items-center">
 
             <a class="navbar-brand text-success logo h1 align-self-center" href="index.php">
-                Zay
+                MicroE
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,13 +93,13 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="index.php">Home</a>
+                            <a class="nav-link" href="index.php?id=<?php echo($id); ?>">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="about.php">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="shop.php">Shop</a>
+                            <a class="nav-link" href="shop.php?id=<?php echo($id); ?>">Shop</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="contact.php">Contact</a>
@@ -125,35 +154,86 @@ https://templatemo.com/tm-559-zay-shop
 
     <!-- Start Banner Hero -->
     <div id="template-mo-zay-hero-carousel" class="carousel slide" data-bs-ride="carousel">
+            <?php
+                //create an counter for the ol
+                $sql="SELECT * FROM homeuser";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $count=0;
+                while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                {
+                    $count++;
+                }
+            ?> 
         <ol class="carousel-indicators">
-            <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="0" class="active"></li>
+            <?php
+            $i=0;
+            //create a dynamic li 
+                while($i<$count)
+                {
+                    if($i==0)
+                    {
+                        ?>
+                        <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="0" class="active"></li>
+                        <?php
+                    }
+                    else
+                    {
+                        ?>
+                        <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="<?php echo($i); ?>"></li>
+                        <?php
+                    }
+                    $i++;
+                }
+            ?>
+            <!-- <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="0" class="active"></li>
             <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="1"></li>
-            <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="2"></li>
+            <li data-bs-target="#template-mo-zay-hero-carousel" data-bs-slide-to="2"></li> -->
         </ol>
         <div class="carousel-inner">
-            <div class="carousel-item active">
+        <?php
+        //get the imgs and the description from the db
+        // $idHome=1;
+        // $count=1;
+        $sql="SELECT * FROM homeuser";
+        try
+        {
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $firstItem = true;
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+            {
+                ?>
+            <div class="carousel-item <?php echo $firstItem ? 'active' : ''; ?>">
                 <div class="container">
                     <div class="row p-5">
                         <div class="mx-auto col-md-8 col-lg-6 order-lg-last">
-                            <img class="img-fluid" src="./assets/img/banner_img_01.jpg" alt="">
+                            <img class="img-fluid" src="imgForHome/<?php echo($row['image']); ?>" alt="">
                         </div>
                         <div class="col-lg-6 mb-0 d-flex align-items-center">
                             <div class="text-align-left align-self-center">
-                                <h1 class="h1 text-success"><b>Zay</b> eCommerce</h1>
-                                <h3 class="h2">Tiny and Perfect eCommerce Template</h3>
+                                <h1 class="h1 text-success"><b>M</b>icroE</h1>
+                                <h3 class="h2"><?php echo($row['header']); ?></h3>
                                 <p>
-                                    Zay Shop is an eCommerce HTML5 CSS template with latest version of Bootstrap 5 (beta 1). 
-                                    This template is 100% free provided by <a rel="sponsored" class="text-success" href="https://templatemo.com" target="_blank">TemplateMo</a> website. 
-                                    Image credits go to <a rel="sponsored" class="text-success" href="https://stories.freepik.com/" target="_blank">Freepik Stories</a>,
-                                    <a rel="sponsored" class="text-success" href="https://unsplash.com/" target="_blank">Unsplash</a> and
-                                    <a rel="sponsored" class="text-success" href="https://icons8.com/" target="_blank">Icons 8</a>.
+                                    <?php echo($row['description']); ?>
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="carousel-item">
+            <?php
+                $firstItem=false;
+                }//end of while
+                }//end of try
+                catch(PDOException $e)
+                {
+                    echo "Connection failed: " . $e->getMessage();
+                }
+            ?>
+
+            <!-- carosuel items -->
+            <!-- <div class="carousel-item">
                 <div class="container">
                     <div class="row p-5">
                         <div class="mx-auto col-md-8 col-lg-6 order-lg-last">
@@ -190,7 +270,7 @@ https://templatemo.com/tm-559-zay-shop
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <a class="carousel-control-prev text-decoration-none w-auto ps-3" href="#template-mo-zay-hero-carousel" role="button" data-bs-slide="prev">
             <i class="fas fa-chevron-left"></i>
@@ -206,20 +286,33 @@ https://templatemo.com/tm-559-zay-shop
     <section class="container py-5">
         <div class="row text-center pt-3">
             <div class="col-lg-6 m-auto">
-                <h1 class="h1">Categories of The Month</h1>
+                <h1 class="h1">Our Categories</h1>
                 <p>
-                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                    deserunt mollit anim id est laborum.
+                    Here you can find the <span class="pColor"><b>Our Categories</b></span>
                 </p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 col-md-4 p-5 mt-3">
-                <a href="#"><img src="./assets/img/category_img_01.jpg" class="rounded-circle img-fluid border"></a>
-                <h5 class="text-center mt-3 mb-3">Watches</h5>
+        <!-- <div class="row">make it dynamic -->
+            <?php
+                $sql="SELECT * FROM catagory";
+                try
+                {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute();
+                    $count=1;//if the count ==3 strat a new row
+                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                    {
+                        if($count==4 || $count==1)
+                        {
+                            echo('<div class="row">');
+                        }   
+            ?>
+             <div class="col-12 col-md-4 p-5 mt-3">
+                <a href="#"><img src="imgForCategory/<?php echo($row['image']); ?>" class="rounded-circle img-fluid border"></a>
+                <h5 class="text-center mt-3 mb-3"><?php echo($row['name']); ?></h5>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
             </div>
-            <div class="col-12 col-md-4 p-5 mt-3">
+           <!-- <div class="col-12 col-md-4 p-5 mt-3">
                 <a href="#"><img src="./assets/img/category_img_02.jpg" class="rounded-circle img-fluid border"></a>
                 <h2 class="h5 text-center mt-3 mb-3">Shoes</h2>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
@@ -228,8 +321,22 @@ https://templatemo.com/tm-559-zay-shop
                 <a href="#"><img src="./assets/img/category_img_03.jpg" class="rounded-circle img-fluid border"></a>
                 <h2 class="h5 text-center mt-3 mb-3">Accessories</h2>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
-            </div>
-        </div>
+            </div> -->
+            <?php
+                    if($count==4)
+                    {
+                        echo('</div>');
+                    }
+                    if($count==3) $count=1; 
+                    else $count++;     
+                }//end of while
+                }//end of try
+                catch(PDOException $e)
+                {
+                    echo "Connection failed: " . $e->getMessage();
+                }
+            ?>
+        <!-- </div> -->
     </section>
     <!-- End Categories of The Month -->
 
@@ -241,81 +348,82 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="col-lg-6 m-auto">
                     <h1 class="h1">Featured Product</h1>
                     <p>
-                        Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                        Excepteur sint occaecat cupidatat non proident.
+                        Here are some of Products that we will provide Soon.
                     </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12 col-md-4 mb-4">
                     <div class="card h-100">
-                        <a href="shop-single.php">
-                            <img src="./assets/img/feature_prod_01.jpg" class="card-img-top" alt="...">
-                        </a>
+                        <!-- <a href="shop-single.php"> -->
+                            <img src="imgFutured/mac.jpg" class="card-img-top" alt="...">
+                        <!-- </a> -->
                         <div class="card-body">
                             <ul class="list-unstyled d-flex justify-content-between">
-                                <li>
+                                <!-- <li>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-muted fa fa-star"></i>
                                     <i class="text-muted fa fa-star"></i>
                                 </li>
-                                <li class="text-muted text-right">$240.00</li>
+                                <li class="text-muted text-right">$240.00</li> -->
                             </ul>
-                            <a href="shop-single.php" class="h2 text-decoration-none text-dark">Gym Weight</a>
+                            <h2 class="h2 text-decoration-none text-dark">Macbook Pro M3 16-Inch</h2><hr>
                             <p class="card-text">
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt in culpa qui officia deserunt.
+                            16-inch Liquid Retina XDR display
+                            Three Thunderbolt 4 ports, HDMI port, SDXC card slot, headphone jack, MagSafe 3 port
+                            Magic Keyboard with Touch ID
+                            Force Touch trackpad
+                            140W USB-C Power Adapterl.
                             </p>
-                            <p class="text-muted">Reviews (24)</p>
+                            <!-- <p class="text-muted">Reviews (24)</p> -->
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 mb-4">
                     <div class="card h-100">
-                        <a href="shop-single.php">
-                            <img src="./assets/img/feature_prod_02.jpg" class="card-img-top" alt="...">
-                        </a>
+                        <!-- <a href="shop-single.php"> -->
+                            <img src="imgFutured/asus.jpg" class="card-img-top" alt="...">
+                        <!-- </a> -->
                         <div class="card-body">
                             <ul class="list-unstyled d-flex justify-content-between">
-                                <li>
+                                <!-- <li>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-muted fa fa-star"></i>
                                     <i class="text-muted fa fa-star"></i>
                                 </li>
-                                <li class="text-muted text-right">$480.00</li>
+                                <li class="text-muted text-right">$480.00</li> -->
                             </ul>
-                            <a href="shop-single.php" class="h2 text-decoration-none text-dark">Cloud Nike Shoes</a>
+                            <h2 class="h2 text-decoration-none text-dark">Asus - Zenbook Pro</h2><hr>
                             <p class="card-text">
-                                Aenean gravida dignissim finibus. Nullam ipsum diam, posuere vitae pharetra sed, commodo ullamcorper.
-                            </p>
-                            <p class="text-muted">Reviews (48)</p>
+                                The best laptop for creative users, it's stylish with state-of-the art components, the best processors and fast graphics to express your creativity anywhere.                            </p>
+                            <!-- <p class="text-muted">Reviews (48)</p> -->
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 mb-4">
                     <div class="card h-100">
-                        <a href="shop-single.php">
-                            <img src="./assets/img/feature_prod_03.jpg" class="card-img-top" alt="...">
-                        </a>
+                        <!-- <a href="shop-single.php"> -->
+                            <img src="imgFutured/lenovo.jpg" class="card-img-top" alt="...">
+                        <!-- </a> -->
                         <div class="card-body">
                             <ul class="list-unstyled d-flex justify-content-between">
-                                <li>
+                                <!-- <li>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                     <i class="text-warning fa fa-star"></i>
                                 </li>
-                                <li class="text-muted text-right">$360.00</li>
+                                <li class="text-muted text-right">$360.00</li> -->
                             </ul>
-                            <a href="shop-single.php" class="h2 text-decoration-none text-dark">Summer Addides Shoes</a>
+                            <h2 class="h2 text-decoration-none text-dark">ThinkPad E16 Gen 1 AMD</h2> <hr>
                             <p class="card-text">
-                                Curabitur ac mi sit amet diam luctus porta. Phasellus pulvinar sagittis diam, et scelerisque ipsum lobortis nec.
-                            </p>
-                            <p class="text-muted">Reviews (74)</p>
+                                The ThinkPad E16 AMD laptop is powerful, reliable, and secure—perfect for your business needs. Tackle all of your jobs and enjoy peak productivity with the power of AMD Ryzen™ 7000 Series processors and integrated AMD Radeon™ graphics. Multitask with ease, thanks to extensive DDR4 memory and speedy SSD storage.                            </p>
+                            <!-- <p class="text-muted">Reviews (74)</p> -->
                         </div>
                     </div>
                 </div>
@@ -331,19 +439,19 @@ https://templatemo.com/tm-559-zay-shop
             <div class="row">
 
                 <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">Zay Shop</h2>
+                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">MicroE</h2>
                     <ul class="list-unstyled text-light footer-link-list">
                         <li>
                             <i class="fas fa-map-marker-alt fa-fw"></i>
-                            123 Consectetur at ligula 10660
+                            JORDAN, AMMAN
                         </li>
                         <li>
                             <i class="fa fa-phone fa-fw"></i>
-                            <a class="text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                            <a class="text-decoration-none" href="tel:010-020-0340">079-999-9999</a>
                         </li>
                         <li>
                             <i class="fa fa-envelope fa-fw"></i>
-                            <a class="text-decoration-none" href="mailto:info@company.com">info@company.com</a>
+                            <a class="text-decoration-none" href="mailto:info@company.com">group@group.com</a>
                         </li>
                     </ul>
                 </div>
@@ -351,13 +459,31 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="col-md-4 pt-5">
                     <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="#">Luxury</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Wear</a></li>
+                <?php
+                    $sql="SELECT * FROM catagory";
+                    try
+                    {
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+                        {
+                ?>
+
+                        <li><a class="text-decoration-none" href="#"><?php echo($row['name']); ?></a></li>
+                        <!-- <li><a class="text-decoration-none" href="#">Sport Wear</a></li>
                         <li><a class="text-decoration-none" href="#">Men's Shoes</a></li>
                         <li><a class="text-decoration-none" href="#">Women's Shoes</a></li>
                         <li><a class="text-decoration-none" href="#">Popular Dress</a></li>
                         <li><a class="text-decoration-none" href="#">Gym Accessories</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Shoes</a></li>
+                        <li><a class="text-decoration-none" href="#">Sport Shoes</a></li> -->
+                    <?php
+                    }//end of while
+                    }//end of try
+                    catch (PDOException $e)
+                    {
+                        echo "Connection failed: " . $e->getMessage();
+                    } 
+                    ?>
                     </ul>
                 </div>
 
@@ -366,12 +492,8 @@ https://templatemo.com/tm-559-zay-shop
                     <ul class="list-unstyled text-light footer-link-list">
                         <li><a class="text-decoration-none" href="#">Home</a></li>
                         <li><a class="text-decoration-none" href="#">About Us</a></li>
-                        <li><a class="text-decoration-none" href="#">Shop Locations</a></li>
-                        <li><a class="text-decoration-none" href="#">FAQs</a></li>
-                        <li><a class="text-decoration-none" href="#">Contact</a></li>
                     </ul>
                 </div>
-
             </div>
 
             <div class="row text-light mb-4">
@@ -394,13 +516,13 @@ https://templatemo.com/tm-559-zay-shop
                         </li>
                     </ul>
                 </div>
-                <div class="col-auto">
+                  <!--<div class="col-auto">
                     <label class="sr-only" for="subscribeEmail">Email address</label>
-                    <div class="input-group mb-2">
+                   <div class="input-group mb-2">
                         <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
                         <div class="input-group-text btn-success text-light">Subscribe</div>
-                    </div>
-                </div>
+                    </div
+                </div>> -->
             </div>
         </div>
 
@@ -409,7 +531,7 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="row pt-2">
                     <div class="col-12">
                         <p class="text-left text-light">
-                            Copyright &copy; 2021 Company Name 
+                            Copyright &copy; 2023 MicroE 
                             | Designed by <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
                         </p>
                     </div>
@@ -430,3 +552,18 @@ https://templatemo.com/tm-559-zay-shop
 </body>
 
 </html>
+
+<?php
+    }//if for checking the id
+    else echo('invalid id number');
+    }//end of try
+    catch (PDOException $e)
+    {
+        echo "Connection failed: " . $e->getMessage();
+    }    
+    }//if for check the $_GET['id']
+    else // if the id does not exist
+    {
+        echo('no id');
+    }
+?>
