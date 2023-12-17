@@ -540,7 +540,7 @@ https://templatemo.com/tm-559-zay-shop
         </div>
 
     </footer>
-    <!-- End Footer -->
+    <!-- End Footer dfs -->
 
     <!-- Start Script -->
     <script src="assets/js/jquery-1.11.0.min.js"></script>
