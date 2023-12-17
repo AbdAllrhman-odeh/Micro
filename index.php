@@ -1,22 +1,3 @@
-<?php
-    require('configuration/config.php');
-    if(isset($_GET['id']))
-    {
-        $id=$_GET['id'];
-        $sql = "SELECT * FROM user WHERE id='$id'";
-        try 
-        {
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            //check if it is a valid id
-            if($stmt->rowCount()>0)
-            {
-                // echo('id exist');
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                $userName=$result['name'];
-                $email=$result['email'];
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -118,9 +99,10 @@ https://templatemo.com/tm-559-zay-shop
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
+                    <a class="nav-icon position-relative text-decoration-none" href="cart.php">
                         <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
+                        <!-- get number of items in cart -->
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark"></span>
                     </a>
                     <a class="nav-icon position-relative text-decoration-none" href="#">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
@@ -292,33 +274,19 @@ https://templatemo.com/tm-559-zay-shop
                 </p>
             </div>
         </div>
-        <!-- <div class="row">make it dynamic -->
-            <?php
-                $sql="SELECT * FROM catagory";
-                try
-                {
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute();
-                    $count=1;//if the count ==3 strat a new row
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
-                    {
-                        if($count==4 || $count==1)
-                        {
-                            echo('<div class="row">');
-                        }   
-            ?>
-             <div class="col-12 col-md-4 p-5 mt-3">
-                <a href="#"><img src="imgForCategory/<?php echo($row['image']); ?>" class="rounded-circle img-fluid border"></a>
-                <h5 class="text-center mt-3 mb-3"><?php echo($row['name']); ?></h5>
+        <div class="row">
+            <div class="col-12 col-md-4 p-5 mt-3">
+                <a href="#"><img src="./assets/img/category_img_01.jpg" class="rounded-circle img-fluid border"></a>
+                <h5 class="text-center mt-3 mb-3">Watches</h5>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
             </div>
-           <!-- <div class="col-12 col-md-4 p-5 mt-3">
+            <div class="col-12 col-md-4 p-5 mt-3">
                 <a href="#"><img src="./assets/img/category_img_02.jpg" class="rounded-circle img-fluid border"></a>
                 <h2 class="h5 text-center mt-3 mb-3">Shoes</h2>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
             </div>
             <div class="col-12 col-md-4 p-5 mt-3">
-                <a href="#"><img src="./assets/img/category_img_03.jpg" class="rounded-circle img-fluid border"></a>
+                <a href="shop.php"><img src="./assets/img/category_img_03.jpg" class="rounded-circle img-fluid border"></a>
                 <h2 class="h5 text-center mt-3 mb-3">Accessories</h2>
                 <p class="text-center"><a class="btn btn-success">Go Shop</a></p>
             </div> -->
@@ -552,18 +520,3 @@ https://templatemo.com/tm-559-zay-shop
 </body>
 
 </html>
-
-<?php
-    }//if for checking the id
-    else echo('invalid id number');
-    }//end of try
-    catch (PDOException $e)
-    {
-        echo "Connection failed: " . $e->getMessage();
-    }    
-    }//if for check the $_GET['id']
-    else // if the id does not exist
-    {
-        echo('no id');
-    }
-?>
